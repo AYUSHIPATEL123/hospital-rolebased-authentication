@@ -1,0 +1,53 @@
+version: '3.11'
+
+services:
+  db:
+    image: mysql:8.0  
+    container_name: rolebasedauth_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123654A@app
+      MYSQL_DATABASE: rolebasedauth_db
+      MYSQL_USER: roleuser
+      MYSQL_PASSWORDD: rolepass
+      TZ: Asia/Kolkata
+    healthcheck:
+        test: ["CMD","mysqladmin","ping","-h","localhost"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
+    ports:
+      - "3307:3306"
+    volumes:
+      - rolebasedauth_data:/var/lib/mysql
+    # command: ["executable", "arg"]   
+
+  web:
+    build: .
+    container_name: rolebasedauth_web
+    restart: always
+
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: >
+        sh -c "
+        python manage.py makemigrations && 
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+        "
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      DB_NAME: rolebasedauth_db
+      DB_USER: roleuser
+      DB_PASSWORD: rolepass
+      DB_HOST: db
+      DB_PORT: 3306
+      TZ: Asia/Kolkata
+volumes:
+  rolebasedauth_data:
