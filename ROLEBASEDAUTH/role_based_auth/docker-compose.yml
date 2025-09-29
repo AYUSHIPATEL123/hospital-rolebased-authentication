@@ -22,6 +22,18 @@ services:
     volumes:
       - rolebasedauth_data:/var/lib/mysql
     # command: ["executable", "arg"]   
+  redis:
+    image: redis:alpine
+    container_name: rolebasedauth_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    container_name: rolebasedauth_celery
+    restart: always
+    command: celery -A role_based_auth worker --loglevel=info
 
   web:
     build: .
@@ -41,7 +53,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
+      celery:
+        condition: service_started
+      redis:
+        condition: service_started
+      
     environment:
       DB_NAME: rolebasedauth_db
       DB_USER: roleuser
