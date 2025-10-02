@@ -99,24 +99,9 @@ Container names mismatch → Use docker ps to see actual names if using docker e
 
 
 
-
-
-
-# Hospital Role-Based Authentication
-
 ## Overview
 
 This project implements a robust role-based authentication system specifically designed for hospital environments. It allows for the secure management of user access based on their roles (e.g., Doctor, Nurse, Admin, Patient), ensuring that each user only has access to the functionalities and data relevant to their position. The system aims to enhance security, streamline operations, and maintain data privacy within a hospital setting.
-
-## Features
-
-*   **Role-Based Access Control (RBAC):** Define and assign distinct roles with specific permissions.
-*   **Secure Authentication:** Implement secure user login and session management.
-*   **User Management:** Admin panel to create, update, and delete user accounts and assign roles.
-*   **Role Management:** Ability to define new roles and modify existing role permissions.
-*   **Patient Data Protection:** Restrict access to sensitive patient information based on user roles.
-*   **Scalable Architecture:** Designed to be easily integrated and scaled within existing or new hospital systems.
-*   **Intuitive User Interface:** (If applicable, describe UI for admin/login)
 
 ## Technologies Used
 
@@ -216,34 +201,10 @@ Before you begin, ensure you have the following installed:
 | `/api/users/:id`         | GET    | Get user by ID                               | Admin, Self      |
 | `/api/users/:id`         | PUT    | Update user details                          | Admin, Self      |
 | `/api/users/:id`         | DELETE | Delete a user                                | Admin            |
-| `/api/patients`          | GET    | Get all patient records                      | Admin, Doctor, Nurse |
-| `/api/patients/:id`      | GET    | Get a specific patient record                | Admin, Doctor, Nurse, Self (patient) |
-| `/api/patients/:id/vitals` | POST   | Add patient vitals                           | Nurse            |
-| `/api/doctors`           | GET    | Get list of doctors                          | All (general info) |
-| `/api/admin/roles`       | GET/POST | Manage roles and permissions                | Admin            |
+| `/api/patients`          | GET    | Get all patient records                      | Admin, Doctor, Staff |
+| `/api/patients/:id`      | GET    | Get a specific patient record                | Admin, Doctor, Staff , Self (patient) |
+| `/api/doctors`           | GET    | Get list of doctors                          | Admin,self |
 
-## Project Structure (Optional, but helpful)
-
-hospital-rolebased-authentication/
-├── backend/
-│ ├── config/
-│ ├── controllers/
-│ ├── models/
-│ ├── routes/
-│ ├── middleware/
-│ ├── server.js
-│ ├── package.json (or requirements.txt)
-│ └── .env.example
-├── frontend/
-│ ├── public/
-│ ├── src/
-│ │ ├── components/
-│ │ ├── pages/
-│ │ ├── services/
-│ │ ├── App.js
-│ │ └── index.js
-│ └── package.json
-└── README.md
 
 ## Contributing
 
