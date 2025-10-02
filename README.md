@@ -19,12 +19,12 @@ A Django-based hospital management system with **role based access control**, bu
 ## 📁 Repository Structure
 
 ├── Dockerfile                                                     
-├── docker-compose.yml
-├── manage.py
-├── requirements.txt
-├── <your_app_folders>
-├── role_based_auth/ ← Django project folder (settings, urls, wsgi, etc.)
-├── account/ ← App for user / authentication & registration
+├── docker-compose.yml                                                    
+├── manage.py                                        
+├── requirements.txt                                        
+├── <your_app_folders>                                            
+├── role_based_auth/ ← Django project folder (settings, urls, wsgi, etc.)                                  
+├── account/ ← App for user / authentication & registration                                             
 └── ...
 
 
