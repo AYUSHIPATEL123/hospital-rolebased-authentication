@@ -18,7 +18,7 @@ A Django-based hospital management system with **role based access control**, bu
 
 ## 📁 Repository Structure
 
-├── Dockerfile
+├── Dockerfile                                                     
 ├── docker-compose.yml
 ├── manage.py
 ├── requirements.txt
@@ -45,7 +45,7 @@ Adjust structure names based on your actual folder names.
    ```bash
    git clone https://github.com/AYUSHIPATEL123/hospital-rolebased-authentication.git
    cd hospital-rolebased-authentication
-
+```
 🧰 Dependencies
 
 Your requirements.txt should include (at minimum):
