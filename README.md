@@ -191,7 +191,7 @@ Before you begin, ensure you have the following installed:
     *   **Nurse:** View patient charts, administer treatments, record observations.
     *   **Patient:** View their own medical history, appointments, and billing information.
 
-## API Endpoints (Optional, but recommended for backend projects)
+## API Endpoints 
 
 | Endpoint                 | Method | Description                                  | Access Role      |
 | :----------------------- | :----- | :------------------------------------------- | :--------------- |
