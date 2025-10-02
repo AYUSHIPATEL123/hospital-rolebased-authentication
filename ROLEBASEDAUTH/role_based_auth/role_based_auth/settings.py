@@ -15,7 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+import os
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -87,12 +87,12 @@ DATABASES = {
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
     'default': {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'rolebasedauth',
-                'USER': 'root',
-                'PASSWORD': 'root',
-                'HOST': 'localhost',  # Or the IP address of your MySQL server
-                'PORT': '3306',       # Default MySQL port
+                'ENGINE':'django.db.backends.mysql',
+                'NAME': os.getenv('DB_NAME', 'rolebasedauth_db'),
+                'USER': os.getenv('DB_USER', 'roleuser'),
+                'PASSWORD': os.getenv('DB_PASSWORD', 'rolepass'),
+                'HOST': os.getenv('DB_HOST', 'db'),  # Or the IP address of your MySQL server
+                'PORT': os.getenv('DB_PORT', '3306'),       # Default MySQL port
             }
 }
 
@@ -189,8 +189,8 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
@@ -199,7 +199,7 @@ CELERY_TIMEZONE = 'Asia/Kolkata'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": "redis://redis:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }

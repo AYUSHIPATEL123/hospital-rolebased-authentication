@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: 123654A@app
       MYSQL_DATABASE: rolebasedauth_db
       MYSQL_USER: roleuser
-      MYSQL_PASSWORDD: rolepass
+      MYSQL_PASSWORD: rolepass
       TZ: Asia/Kolkata
     healthcheck:
         test: ["CMD","mysqladmin","ping","-h","localhost"]
@@ -28,15 +28,23 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-
   celery:
     build: .
     container_name: rolebasedauth_celery
     restart: always
     command: celery -A role_based_auth worker --loglevel=info
-
+    depends_on:
+      - db
+      - redis
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      TZ: Asia/Kolkata
+        
   web:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: rolebasedauth_web
     restart: always
 
