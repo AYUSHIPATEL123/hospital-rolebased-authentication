@@ -40,7 +40,7 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       TZ: Asia/Kolkata
-        
+    
   web:
     build: 
       context: .
@@ -61,8 +61,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      celery:
-        condition: service_started
       redis:
         condition: service_started
       
@@ -73,5 +71,20 @@ services:
       DB_HOST: db
       DB_PORT: 3306
       TZ: Asia/Kolkata
+  celerybeat:
+    build: .
+    container_name: rolebasedauth_celery_beat
+    restart: always
+    command: celery -A role_based_auth beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler   
+    depends_on:
+      - db
+      - redis
+      - web
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      TZ: Asia/Kolkata      
 volumes:
   rolebasedauth_data:

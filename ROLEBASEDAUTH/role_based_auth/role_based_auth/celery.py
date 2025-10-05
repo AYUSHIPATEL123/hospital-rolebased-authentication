@@ -1,7 +1,7 @@
 import os
 import platform
 from celery import Celery
-
+from celery.schedules import crontab
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'role_based_auth.settings')
 
@@ -14,9 +14,16 @@ if platform.system() == "Windows":
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
+
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
+app.conf.beat_schedule = {
+    'daily-reminder-every-morning': {
+        'task': 'account.tasks.daily_reminder',
+        'schedule': crontab(hour=6,minute=10) 
+    },
+}
 
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):

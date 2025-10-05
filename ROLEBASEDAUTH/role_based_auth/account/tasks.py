@@ -19,6 +19,23 @@ def send_email(user_id):
     send_email_massege.send(fail_silently=False)
     return None  
 
+@shared_task
+def daily_reminder_email(user_id):
+    user = User.objects.get(pk=user_id)
+    subject = "Daily Reminder"
+    message = f"Hello {user.first_name}, stay engaged with your work."
+    send_email_massege = EmailMessage(subject=subject,body=message,from_email=settings.EMAIL_HOST_USER,to=[user.email])
+    send_email_massege.send(fail_silently=False)
+    return None
+
+@shared_task
+def daily_reminder():
+    users = User.objects.all()
+    for user in users:
+        daily_reminder_email.delay(user.id)
+    return None
+
+        
     
     
     
