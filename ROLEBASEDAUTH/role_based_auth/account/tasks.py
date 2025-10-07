@@ -29,12 +29,21 @@ def daily_reminder_email(user_id):
     return None
 @shared_task
 def weekly_reminder_email(user_id):
-    user = User.objects.get(pk=user_id)
-    subject = "Weekly Reminder"
-    message = f"Hello {user.first_name}, please don't forget to check your tasks and complete them on time."
-    send_email_massege = EmailMessage(subject=subject,body=message,from_email=settings.EMAIL_HOST_USER,to=[user.email])
-    send_email_massege.send(fail_silently=False)
-    return None
+    try:
+        user = User.objects.get(pk=user_id)
+        subject = "Weekly Reminder"
+        message = f"Hello {user.first_name}, please don't forget to check your tasks and complete them on time."
+        send_email_message = EmailMessage(
+            subject=subject,
+            body=message,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[user.email]
+        )
+        send_email_message.send(fail_silently=False)
+        return True
+    except Exception as e:
+        print(f"Error sending email to user {user_id}: {str(e)}")
+        return False
 
 @shared_task
 def daily_reminder():

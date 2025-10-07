@@ -4,7 +4,7 @@ services:
   db:
     image: mysql:8.0  
     container_name: rolebasedauth_db
-    restart: unless-stopped
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123654A@app
       MYSQL_DATABASE: rolebasedauth_db
@@ -12,7 +12,7 @@ services:
       MYSQL_PASSWORD: rolepass
       TZ: Asia/Kolkata
     healthcheck:
-        test: ["CMD","mysqladmin","ping","-h","localhost"]
+        test: ["CMD","mysqladmin","ping","-h","localhost","-uroot", "-p123654A@app"]
         interval: 10s
         timeout: 5s
         retries: 5
@@ -54,7 +54,7 @@ services:
     volumes:
       - .:/app
     command: >
-        sh -c "
+        sh -c "./wait-for-db.sh
         python manage.py makemigrations && 
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
@@ -76,14 +76,23 @@ services:
     build: .
     container_name: rolebasedauth_celery_beat
     restart: always
-    command: celery -A role_based_auth beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler   
+    command: ["sh", "wait-for-db.sh", "celery", "-A", "role_based_auth", "beat", "-l", "info", "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler"]
     depends_on:
-      - db
-      - redis
-      - web
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      web:
+        condition: service_started
     volumes:
       - .:/app
     environment:
+      DB_NAME: rolebasedauth_db
+      DB_USER: roleuser
+      DB_PASSWORD: rolepass
+      DB_HOST: db
+      DB_PORT: 3306
+
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       TZ: Asia/Kolkata      
