@@ -21,7 +21,7 @@ def home(request):
     # add(4,5)
     return HttpResponse("<h1>hello..v..</h1>")
 def weekly_reminder_view(request):
-    schedule, _ = CrontabSchedule.objects.get_or_create(minute='22',hour='0',day_of_week='*',day_of_month='*',month_of_year='*',timezone=getattr(settings, "TIME_ZONE", "UTC"))
+    schedule, _ = CrontabSchedule.objects.get_or_create(minute='*',hour='*',day_of_week='*',day_of_month='*',month_of_year='*',timezone=getattr(settings, "TIME_ZONE", "UTC"))
     task, created = PeriodicTask.objects.get_or_create(crontab=schedule,task='account.tasks.weekly_reminder',name='weekly-reminder-task-1',enabled=True)
     if not created:
             # Update existing task if needed
