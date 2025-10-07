@@ -21,7 +21,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'daily-reminder-every-morning': {
         'task': 'account.tasks.daily_reminder',
-        'schedule': crontab(hour=6,minute=10) 
+        'schedule': crontab(hour=8,minute=10) 
     },
 }
 

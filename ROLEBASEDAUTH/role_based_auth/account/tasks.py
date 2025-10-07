@@ -23,7 +23,15 @@ def send_email(user_id):
 def daily_reminder_email(user_id):
     user = User.objects.get(pk=user_id)
     subject = "Daily Reminder"
-    message = f"Hello {user.first_name}, stay engaged with your work."
+    message = f"Hello {user.first_name}, stay engaged with your work.stay active login to this wensite."
+    send_email_massege = EmailMessage(subject=subject,body=message,from_email=settings.EMAIL_HOST_USER,to=[user.email])
+    send_email_massege.send(fail_silently=False)
+    return None
+@shared_task
+def weekly_reminder_email(user_id):
+    user = User.objects.get(pk=user_id)
+    subject = "Weekly Reminder"
+    message = f"Hello {user.first_name}, please don't forget to check your tasks and complete them on time."
     send_email_massege = EmailMessage(subject=subject,body=message,from_email=settings.EMAIL_HOST_USER,to=[user.email])
     send_email_massege.send(fail_silently=False)
     return None
@@ -35,7 +43,9 @@ def daily_reminder():
         daily_reminder_email.delay(user.id)
     return None
 
-        
-    
-    
-    
+@shared_task
+def weekly_reminder():
+    users = User.objects.all()
+    for user in users:
+        weekly_reminder_email.delay(user.id)
+    return None

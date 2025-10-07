@@ -12,12 +12,18 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import HttpResponse
 from .tasks import send_email,add
+from django_celery_beat.models import PeriodicTask,CrontabSchedule
 # Create your views here.
 
 def home(request):
     add.delay(4,5)
     # add(4,5)
     return HttpResponse("<h1>hello..v..</h1>")
+def weekly_reminder_view(request):
+    schedule, created = CrontabSchedule.objects.get_or_create(hour=13,minute=45,week_of_month='*',day_of_week='*',day_of_month='*',month_of_year='*')
+    task = PeriodicTask.objects.create(crontab=schedule,name="weekly-reminder-task",task="account.tasks.weekly_reminder")
+    return HttpResponse("<h1>weekly reminder set</h1>")
+
 class RegisterView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
