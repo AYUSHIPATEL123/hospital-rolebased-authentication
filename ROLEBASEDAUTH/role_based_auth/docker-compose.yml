@@ -16,7 +16,6 @@ services:
         interval: 10s
         timeout: 5s
         retries: 5
-
     ports:
       - "3307:3306"
     volumes:
@@ -33,6 +32,8 @@ services:
     container_name: rolebasedauth_celery
     restart: always
     command: celery -A role_based_auth worker --loglevel=info
+    volumes:
+      - .:/app
     depends_on:
       - db
       - redis

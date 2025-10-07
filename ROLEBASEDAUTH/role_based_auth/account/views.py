@@ -13,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import HttpResponse
 from .tasks import send_email,add
 from django_celery_beat.models import PeriodicTask,CrontabSchedule
+from django.conf import settings
 # Create your views here.
 
 def home(request):
@@ -20,15 +21,20 @@ def home(request):
     # add(4,5)
     return HttpResponse("<h1>hello..v..</h1>")
 def weekly_reminder_view(request):
-    schedule, created = CrontabSchedule.objects.get_or_create(hour=13,minute=45,week_of_month='*',day_of_week='*',day_of_month='*',month_of_year='*')
-    task = PeriodicTask.objects.create(crontab=schedule,name="weekly-reminder-task",task="account.tasks.weekly_reminder")
+    schedule, _ = CrontabSchedule.objects.get_or_create(minute='6',hour='18',day_of_week='*',day_of_month='*',month_of_year='*',timezone=getattr(settings, "TIME_ZONE", "UTC"),)
+    task, created = PeriodicTask.objects.get_or_create(crontab=schedule,task='account.tasks.weekly_reminder',name='weekly-reminder-task',enabled=True)
+    if not created:
+            # Update existing task if needed
+            task.crontab = schedule
+            task.enabled = True
+            task.save()
+
     return HttpResponse("<h1>weekly reminder set</h1>")
 
 class RegisterView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
     queryset = User.objects.all()
-    
     
 class LoginView(APIView):
     permission_classes = [AllowAny]    
@@ -98,8 +104,7 @@ class StaffViewSet(viewsets.ModelViewSet):
     serializer_class = StaffSerializer
     # queryset  = StaffProfile.objects.all()
     permission_classes = [IsAuthenticated]
-    
-    
+     
     def get_permissions(self):
         if self.action == 'create':
             return [IsAdmin()]
