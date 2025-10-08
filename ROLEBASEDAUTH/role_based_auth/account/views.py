@@ -21,15 +21,22 @@ def home(request):
     # add(4,5)
     return HttpResponse("<h1>hello..v..</h1>")
 def weekly_reminder_view(request):
-    schedule, _ = CrontabSchedule.objects.get_or_create(minute='*',hour='*',day_of_week='*',day_of_month='*',month_of_year='*',timezone=getattr(settings, "TIME_ZONE", "UTC"))
-    task, created = PeriodicTask.objects.get_or_create(crontab=schedule,task='account.tasks.weekly_reminder',name='weekly-reminder-task-1',enabled=True)
-    if not created:
-            # Update existing task if needed
-            task.crontab = schedule
-            task.enabled = True
-            task.save()
+    schedule, _ = CrontabSchedule.objects.get_or_create(minute='60',hour='0',day_of_week='*',day_of_month='*',month_of_year='*',timezone=getattr(settings, "TIME_ZONE", "Asia/Kolkata"))
+    # PeriodicTask.objects.filter(task='account.tasks.weekly_reminder').delete()
+    task_name = "weekly-reminder-task"
+    task, created = PeriodicTask.objects.update_or_create(crontab=schedule,task='account.tasks.weekly_reminder',name=task_name+"1" ,enabled=True)
+    # if not created:
+    #         # Update existing task if needed
+    #         task.crontab = schedule
+    #         task.enabled = True
+    #         task.save()
+    task.save()
+    if created:
+        msg = "✅ Weekly reminder task created."
+    else:
+        msg = "🔄 Weekly reminder task updated."
 
-    return HttpResponse("<h1>weekly reminder set</h1>")
+    return HttpResponse(f"<h1>weekly reminder {msg} </h1>")
 
 class RegisterView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]

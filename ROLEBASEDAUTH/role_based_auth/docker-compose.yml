@@ -5,15 +5,16 @@ services:
     image: mysql:8.0  
     container_name: rolebasedauth_db
     restart: always
-    
+    command: --default-authentication-plugin=mysql_native_password --skip-ssl
     environment:
+      DJANGO_SETTINGS_MODULE: role_based_auth.settings
       MYSQL_ROOT_PASSWORD: 123654A@app
       MYSQL_DATABASE: rolebasedauth_db
       MYSQL_USER: roleuser
       MYSQL_PASSWORD: rolepass
       TZ: Asia/Kolkata
     healthcheck:
-        test: ["CMD","mysqladmin","ping","-h","db","-uroot","-p123654A@app"]
+        test: ["CMD","mysqladmin","ping","-h", "db", "--silent"]
         interval: 10s
         timeout: 5s
         retries: 5
@@ -46,12 +47,8 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    command: >
-        sh -c "./wait-for-db.sh db && \
-        python manage.py makemigrations && \
-        python manage.py migrate && \
-        python manage.py runserver 0.0.0.0:8000
-        "
+    command: ["./wait-for-db.sh", "db", "sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+
     depends_on:
       db:
         condition: service_healthy
@@ -69,7 +66,7 @@ services:
     build: .
     container_name: rolebasedauth_celery
     restart: always
-    command: celery -A role_based_auth worker --loglevel=info
+    command: ["./wait-for-db.sh", "db", "celery", "-A", "role_based_auth", "worker", "--loglevel=info"]
     volumes:
       - .:/app
     depends_on:
@@ -85,7 +82,12 @@ services:
     build: .
     container_name: rolebasedauth_celery_beat
     restart: always
-    command: ["sh", "wait-for-db.sh", "db", "--", "celery", "-A", "role_based_auth", "beat", "-l", "info", "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler"]
+    command: ["./wait-for-db.sh", "db",
+      "celery", "-A", "role_based_auth",
+      "beat", "-l", "info",
+      "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler",
+      "--max-interval", "10"]
+
     depends_on:
       db:
         condition: service_healthy
@@ -106,3 +108,12 @@ services:
       TZ: Asia/Kolkata      
 volumes:
   rolebasedauth_data:
+
+
+
+
+
+
+
+
+  

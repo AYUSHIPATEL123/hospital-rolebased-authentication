@@ -95,8 +95,8 @@ DATABASES = {
                 'HOST': os.getenv('DB_HOST', 'db'),  # Or the IP address of your MySQL server
                 'PORT': os.getenv('DB_PORT', '3306'),
                  'OPTIONS': {
-            'ssl': None,  # Disable SSL for local Docker setup
-        }, #Default MySQL port
+            'ssl': {'ssl_disabled': True},  # ✅ disable SSL explicitly
+        },  # Default MySQL port
             }
 }
 
