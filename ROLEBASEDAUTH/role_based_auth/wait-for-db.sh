@@ -14,4 +14,4 @@ done
 
 >&2 echo "✅ MySQL is up - executing command"
 
-exec "$@"
+exec $cmd 
