@@ -2,8 +2,8 @@
 # wait-for-db.sh
 set -e
 
-host='db'
-cmd="$@"
+host="$1"
+shift
 
 echo "⏳Waiting for MySQL at $host..."
 
@@ -14,4 +14,4 @@ done
 
 >&2 echo "✅ MySQL is up - executing command"
 
-exec $cmd 
+exec "$@" 
