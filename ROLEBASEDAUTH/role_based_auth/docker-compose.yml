@@ -5,6 +5,7 @@ services:
     image: mysql:8.0  
     container_name: rolebasedauth_db
     restart: always
+    
     environment:
       MYSQL_ROOT_PASSWORD: 123654A@app
       MYSQL_DATABASE: rolebasedauth_db
@@ -12,7 +13,7 @@ services:
       MYSQL_PASSWORD: rolepass
       TZ: Asia/Kolkata
     healthcheck:
-        test: ["CMD","mysqladmin","ping","-h","localhost","-uroot", "-p123654A@app"]
+        test: ["CMD","mysqladmin","ping","-h","db","-uroot","-p123654A@app"]
         interval: 10s
         timeout: 5s
         retries: 5
@@ -27,20 +28,12 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-  celery:
-    build: .
-    container_name: rolebasedauth_celery
-    restart: always
-    command: celery -A role_based_auth worker --loglevel=info
-    volumes:
-      - .:/app
-    depends_on:
-      - db
-      - redis
-    environment:
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
-      TZ: Asia/Kolkata
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5  
+ 
     
   web:
     build: 
@@ -54,16 +47,16 @@ services:
     volumes:
       - .:/app
     command: >
-        sh -c "./wait-for-db.sh
-        python manage.py makemigrations && 
-        python manage.py migrate &&
+        sh -c "./wait-for-db.sh db && \
+        python manage.py makemigrations && \
+        python manage.py migrate && \
         python manage.py runserver 0.0.0.0:8000
         "
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       
     environment:
       DB_NAME: rolebasedauth_db
@@ -72,16 +65,32 @@ services:
       DB_HOST: db
       DB_PORT: 3306
       TZ: Asia/Kolkata
-  celerybeat:
+  celery:
     build: .
-    container_name: rolebasedauth_celery_beat
+    container_name: rolebasedauth_celery
     restart: always
-    command: ["sh", "wait-for-db.sh", "celery", "-A", "role_based_auth", "beat", "-l", "info", "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler"]
+    command: celery -A role_based_auth worker --loglevel=info
+    volumes:
+      - .:/app
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      TZ: Asia/Kolkata    
+  celerybeat:
+    build: .
+    container_name: rolebasedauth_celery_beat
+    restart: always
+    command: ["sh", "wait-for-db.sh", "db", "--", "celery", "-A", "role_based_auth", "beat", "-l", "info", "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
       web:
         condition: service_started
     volumes:
