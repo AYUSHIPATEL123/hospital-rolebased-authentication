@@ -20,11 +20,12 @@ def home(request):
     add.delay(4,5)
     # add(4,5)
     return HttpResponse("<h1>hello..v..</h1>")
+
 def weekly_reminder_view(request):
-    schedule, _ = CrontabSchedule.objects.get_or_create(minute='60',hour='0',day_of_week='*',day_of_month='*',month_of_year='*',timezone=getattr(settings, "TIME_ZONE", "Asia/Kolkata"))
-    # PeriodicTask.objects.filter(task='account.tasks.weekly_reminder').delete()
+    schedule, _ = CrontabSchedule.objects.get_or_create(minute='10',hour='16',day_of_week='*',day_of_month='*',month_of_year='*',timezone=getattr(settings, "TIME_ZONE", "Asia/Kolkata"))
+    PeriodicTask.objects.filter(task='account.tasks.weekly_reminder').delete()
     task_name = "weekly-reminder-task"
-    task, created = PeriodicTask.objects.update_or_create(crontab=schedule,task='account.tasks.weekly_reminder',name=task_name+"1" ,enabled=True)
+    task, created = PeriodicTask.objects.get_or_create(crontab=schedule,task='account.tasks.weekly_reminder',name=task_name ,enabled=True)
     # if not created:
     #         # Update existing task if needed
     #         task.crontab = schedule
