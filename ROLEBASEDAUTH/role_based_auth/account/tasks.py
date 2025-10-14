@@ -49,8 +49,8 @@ def weekly_reminder_email(user_id):
 def daily_reminder():
     users = User.objects.all()
     for user in users:
-        daily_reminder_email.delay(user.id)
-    return None
+        daily_reminder_email.delay(user.pk)
+    return "send weekly reminder email"
 
 @shared_task
 def weekly_reminder():
