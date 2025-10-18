@@ -37,7 +37,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"message":"employee_id and doctor are required"})
         return data
     
-    def create(self, validated_data):
+    def create(self, validated_data):  
         user = User.objects.create_user(username=validated_data['username'],email=validated_data['email'],first_name=validated_data['first_name'],last_name=validated_data['last_name'],password=validated_data['password'],role=validated_data['role']) 
         user.save()
         role = validated_data.get('role')
