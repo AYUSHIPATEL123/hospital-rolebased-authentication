@@ -29,9 +29,6 @@ def weekly_reminder_view(request):
     task.save()
     if created:
         msg = "✅ Weekly reminder task created."
-    else:
-        msg = "🔄 Weekly reminder task updated."
-
     return HttpResponse(f"<h1>weekly reminder {msg} </h1>")
 
 class RegisterView(viewsets.ModelViewSet):
