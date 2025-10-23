@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase , APIClient
 from django.urls import reverse
-from account.models import User,PatientProfile,AdminProfile
+from account.models import User,PatientProfile,AdminProfile,DoctorProfile,Mapping,StaffProfile
 class WeeklyReminderViewTestCase(APITestCase):
     def test_weekly_reminder_view(self):
         response = self.client.get(reverse('weekly_reminder'))
@@ -70,4 +70,69 @@ class AdminViewSetTestCase(APITestCase):
 class PatientViewSetTestCase(APITestCase):
     def setUp(self):
         self.patient_user = User.objects.create_user(username='patientuser',password='patientpass',role='Patient',email='patient@example.com')
+        self.patient_profile = PatientProfile.objects.create(user=self.patient_user,medical_history='No allergies',date_of_birth='1990-01-01',blood_group='O+',city='TestCity',state='TestState')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.patient_user)
         
+    
+    def test_patientprofile_view(self):
+        url = f'/api/patient/{self.patient_profile.id}/'  
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['medical_history'], 'No allergies')
+        self.assertEqual(response.data['user'], self.patient_user.id)
+        self.assertEqual(response.data['date_of_birth'], '1990-01-01')
+        self.assertEqual(response.data['blood_group'], 'O+')
+        self.assertEqual(response.data['city'], 'TestCity')
+        self.assertEqual(response.data['state'], 'TestState')
+
+class DoctorViewSetTestCase(APITestCase):
+    def setUp(self):
+        self.doctor_user = User.objects.create_user(username='doctoruser',password='doctorpass',role='Doctor',email='doctor@example.com')
+        self.doctor_profile = DoctorProfile.objects.create(user=self.doctor_user,specialization='Cardiology',license_number='LIC123',hospital='City Hospital',department='Cardio')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.doctor_user)
+
+    def test_doctorprofile_view(self):
+        url = f'/api/doctor/{self.doctor_profile.id}/'
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data['user'],self.doctor_user.id)
+        self.assertEqual(response.data['specialization'],'Cardiology') # 'secialization'
+        self.assertEqual(response.data['license_number'],'LIC123')
+        self.assertEqual(response.data['hospital'],'City Hospital')
+        self.assertEqual(response.data['department'],'Cardio')
+
+class StaffViewSetTestCase(APITestCase):
+    def setUp(self):
+        self.staff_user = User.objects.create_user(username='staffuser',password='staffpass',role='Staff',email='staff@example.com')
+        self.doctor_user = User.objects.create_user(username='doctoruser2',password='doctorpass2',role='Doctor',    email='doctor@example.com')
+        self.doctor_profile = DoctorProfile.objects.create(user=self.doctor_user,specialization='Cardiology',license_number='LIC123',hospital='City Hospital',department='Cardio')
+        self.staff_profile = StaffProfile.objects.create(user=self.staff_user,employee_id='EMP123',doctor=self.doctor_profile)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.staff_user)
+    def test_staffprofile_view(self):
+        url = f'/api/staff/{self.staff_profile.id}/'
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data['user'],self.staff_user.id)
+        self.assertEqual(response.data['employee_id'],'EMP123')
+        self.assertEqual(response.data['doctor'],self.doctor_profile.id)
+    
+    
+class MappingViewSetTestCase(APITestCase):
+    def setUp(self):
+        self.doctor_user = User.objects.create_user(username='doctoruser',password='doctorpass',role='Doctor',email='doctor@example.com')
+        self.doctor_profile = DoctorProfile.objects.create(user=self.doctor_user,specialization='Cardiology',license_number='LIC123',hospital='City Hospital',department='Cardio')
+        self.patient_user = User.objects.create_user(username='patientuser',password='patientpass',role='Patient',email='patient@example.com')
+        self.patient_profile = PatientProfile.objects.create(user=self.patient_user,medical_history='No allergies',date_of_birth='1990-01-01',blood_group='O+',city='TestCity',state='TestState')
+        self.mapping = Mapping.objects.create(doctor=self.doctor_profile,patient=self.patient_profile,remarks='Regular checkup')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.doctor_user)
+    def test_mapping_view(self):
+        url = f'/api/mapping/{self.mapping.id}/'
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data['doctor'],self.doctor_profile.id)
+        self.assertEqual(response.data['patient'],self.patient_profile.id)
+        self.assertEqual(response.data['remarks'],'Regular checkup')

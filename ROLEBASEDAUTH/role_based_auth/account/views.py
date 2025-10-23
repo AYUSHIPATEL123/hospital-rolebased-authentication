@@ -152,7 +152,7 @@ class PatientViewSet(viewsets.ModelViewSet):
         if user.role == "Admin":
             return PatientProfile.objects.all()
         elif user.role == "Doctor":
-            return PatientProfile.objects.all()
+            return PatientProfile.objects.filter(doctor=doctor)
         elif user.role == "Patient":
             return PatientProfile.objects.filter(user=user)
         else:
