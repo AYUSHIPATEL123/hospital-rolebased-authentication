@@ -20,7 +20,21 @@ class SerializerTestCase(TestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.validated_data['username'], data['username'])
         self.assertEqual(serializer.validated_data['role'], data['role'])
-    
+    def test_register_serializer_invalid_role(self):
+        data = {
+            'username': 'testuser',
+            'email': 'testuser@example.com',
+            'password': 'testpass123',
+            'role': 'InvalidRole',
+            'medical_history': 'No known allergies',
+            'date_of_birth': '1990-01-01',
+            'blood_group': 'O+',
+            'city': 'Test City',
+            'state': 'Test State'
+        }
+        serializer = RegisterSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('role', serializer.errors)
     def test_user_profile_serializer(self):
         user = User.objects.create_user(username='testuser',password='testpass123',role='Patient')
         serializer = UserProfileSerializer(user)
@@ -35,7 +49,6 @@ class SerializerTestCase(TestCase):
             } 
         serializer = LoginSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
-           
     def test_admin_serializer(self):
         user = User.objects.create_user(username='adminuser',password='adminpass',role='Admin')
         admin_serializer = AdminSerializer(data={'user':user.id,'admin_id':'ADM001'})

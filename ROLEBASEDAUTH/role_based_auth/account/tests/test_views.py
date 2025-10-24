@@ -47,12 +47,18 @@ class LoginViewTestCase(APITestCase):
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, 200)
+        
         self.assertIn('access_token', response.data)
         self.assertIn('refresh_token', response.data)
         self.assertEqual(response.data['data']['username'], 'testuser')
         self.assertEqual(response.data['data']['email'],'testuser@example.com')
         self.assertTrue(self.user.check_password('testpassword'))
-
+        
+    def test_error_login_view(self):
+        response = self.client.post('/api/login/', {'username': 'wrong', 'password': 'wrong'},format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('message', response.data)
+        self.assertEqual(response.data['message'], 'invalid credentials')
 class AdminViewSetTestCase(APITestCase):
     def setUp(self):
         self.admin_user = User.objects.create_user(username='adminuser', email='admin@example.com', password='adminpass', role='Admin')

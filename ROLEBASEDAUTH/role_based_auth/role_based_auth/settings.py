@@ -233,3 +233,8 @@ EMAIL_HOST_PASSWORD = 'nqsvxjiwopcelyfv'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_FAIL_SILENTLY = False
+# if 'test' in sys.argv:
+#     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+if 'test' in sys.argv:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
