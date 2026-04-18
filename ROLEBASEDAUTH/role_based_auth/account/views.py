@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from .models import User,PatientProfile,AdminProfile,DoctorProfile,Mapping,StaffProfile
 from rest_framework.decorators import action
 from django.contrib.auth import authenticate
-from .permissions import IsAdmin,IsPatient,IsDoctor,IsOwnerOrAdmin,IsDoctorOrAdmin,IsDoctorOrAdminOrPatient,IsDoctorOrAdminOrPatientOrStaff,IsDoctorOrAdminOrStaff
+from .permissions import IsAdmin,IsPatient,IsDoctor,IsOwnerOrAdmin,IsAdminOrPatient,IsDoctorOrAdmin,IsDoctorOrAdminOrPatient,IsDoctorOrAdminOrPatientOrStaff,IsDoctorOrAdminOrStaff
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import HttpResponse
@@ -73,7 +73,8 @@ class AdminViewSet(viewsets.ModelViewSet):
         if user.role == "Admin":
             return AdminProfile.objects.filter(user=user)
         else:
-            return AdminProfile.objects.none()        
+            return AdminProfile.objects.none()
+                
 class DoctorViewSet(viewsets.ModelViewSet):
     serializer_class = DoctorSerializer
     # queryset = DoctorProfile.objects.all()
@@ -129,6 +130,7 @@ class StaffViewSet(viewsets.ModelViewSet):
             return StaffProfile.objects.filter(user=user)
         else:
             return StaffProfile.objects.none()
+        
 class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
     # queryset = PatientProfile.objects.all()
@@ -137,22 +139,23 @@ class PatientViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return [IsAdmin()]
         elif self.action in ['update','partial_update']:
-            return [IsDoctorOrAdminOrPatientOrStaff()]
+            return [IsAdminOrPatient()]
         elif self.action == 'retrieve':
-            return [IsDoctorOrAdminOrPatientOrStaff()]
+            return [IsAdminOrPatient()]
         elif self.action == 'destroy':
             return [IsAdmin()]
         elif self.action == 'list':
-            return [IsDoctorOrAdminOrStaff()]
+            return [IsDoctorOrAdminOrPatient()]
         return [IsAdmin()]
 
     def get_queryset(self):
         user = self.request.user
-        doctor = DoctorProfile.objects.filter(user=self.request.user).first()
+        # doctor = DoctorProfile.objects.filter(user=self.request.user).first()
+
         if user.role == "Admin":
             return PatientProfile.objects.all()
         elif user.role == "Doctor":
-            return PatientProfile.objects.filter(doctor=doctor)
+            return PatientProfile.objects.all()
         elif user.role == "Patient":
             return PatientProfile.objects.filter(user=user)
         else:

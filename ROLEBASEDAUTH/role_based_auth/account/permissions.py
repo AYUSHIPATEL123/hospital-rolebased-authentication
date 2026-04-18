@@ -22,6 +22,9 @@ class IsDoctorOrAdminOrPatientOrStaff(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role in ["Admin","Doctor","Patient",'Staff']  
 
+class IsAdminOrPatient(BasePermission):
+    def has_permission(self,request,view):
+        return request.user.is_authenticated and request.user.role in ["Admin","Patient"]  
 class IsDoctorOrAdminOrStaff(BasePermission):
     def has_permission(self,request,view):
         return request.user.is_authenticated and request.user.role in ["Admin","Doctor","Staff"]          

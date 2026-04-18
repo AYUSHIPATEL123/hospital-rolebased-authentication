@@ -88,7 +88,8 @@ class StaffSerializer(serializers.ModelSerializer):
     doctor_details = DoctorSerializer(source='doctor',read_only=True)
     class Meta:
         model = StaffProfile
-        fields = ['id','user','employee_id','doctor','doctor_details']        
+        fields = ['id','user','employee_id','doctor','doctor_details']
+                
 class MappingSerializer(serializers.ModelSerializer):
     doctor_details = DoctorSerializer(source='doctor',read_only=True)
     patient_details = PatientSerializer(source='patient',read_only=True)
