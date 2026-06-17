@@ -90,15 +90,21 @@ DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 
 DB_HOST=localhost
+
 DB_PORT=3306
+
 DB_NAME=hospital_db
+
 DB_USER=your_db_user
+
 DB_PASSWORD=your_db_password
 
 REDIS_HOST=localhost
+
 REDIS_PORT=6379
 
 CELERY_BROKER_URL=redis://localhost:6379/0
+
 CELERY_RESULT_BACKEND=redis://localhost:6379/1
 
 JWT_SECRET_KEY=your_jwt_secret   # if using JWT
@@ -265,7 +271,7 @@ Submit a pull request, explaining the changes
 
 Please ensure your code follows PEP8 style and includes necessary tests/documentation.
 
-License
+### License
 
 This project is licensed under the MIT License — see LICENSE file.
 
