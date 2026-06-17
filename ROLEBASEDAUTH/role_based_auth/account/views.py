@@ -89,7 +89,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
         elif self.action == 'destroy':
             return [IsAdmin()]
         elif self.action == 'list':
-            return [IsAdmin()]
+            return [IsDoctorOrAdmin()]
         return [IsAdmin()]
     
     def get_queryset(self):
@@ -117,7 +117,7 @@ class StaffViewSet(viewsets.ModelViewSet):
             return [IsAdmin()]
         elif self.action == 'list':
             return [IsDoctorOrAdminOrStaff()]
-        return [IsAdmin()]
+        return [IsDoctorOrAdminOrStaff()]
     
     def get_queryset(self):
         user = self.request.user
@@ -182,6 +182,7 @@ class MappingViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         doctor = DoctorProfile.objects.filter(user=self.request.user).first()
         user = self.request.user
+        
         if user.role == "Admin":
             return Mapping.objects.all()
         elif user.role == "Doctor":

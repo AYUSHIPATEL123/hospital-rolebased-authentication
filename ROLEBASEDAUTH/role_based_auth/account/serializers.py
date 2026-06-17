@@ -62,7 +62,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             employee_id = validated_data.pop('employee_id','')
             doctor = validated_data.pop('doctor',None)
             StaffProfile.objects.create(user=user,employee_id=employee_id,doctor=doctor).save()
-        send_email.delay(user.pk)    
+        # send_email.delay(user.pk)    
         return user
     
 class LoginSerializer(serializers.Serializer):
